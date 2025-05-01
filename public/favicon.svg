@@ -1,0 +1,17 @@
+<svg 
+    width="104" 
+    height="104" 
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <text
+        font-family="Arial"
+        font-size="50" 
+        y="40" 
+        font-weight="bold"
+    >
+        <tspan x="0" y="40" fill="#397af6">A</tspan>
+        <tspan x="36" y="70" fill="#ECAF20">R</tspan>
+        <tspan x="68" y="100" fill="#ca2230">C</tspan>
+
+    </text>        
+</svg>
