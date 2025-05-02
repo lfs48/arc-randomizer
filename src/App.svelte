@@ -1,6 +1,5 @@
 <script>
   import { RiLockLine, RiLockUnlockLine, RiSettings3Fill } from 'svelte-remixicon';
-    import { get } from 'svelte/store';
 
   const data = {
     anomaly: {
@@ -190,21 +189,21 @@
 
 <main class='w-screen flex items-center bg-zinc-100 font-roboto'>
   {#if settings.open}
-    <div class="fixed top-7 right-3 flex space-x-4 pl-3 py-3 pr-12 bg-zinc-100 rounded-full">
+    <div class="fixed top-7 right-7 flex space-x-4 pl-3 py-3 pr-12 bg-zinc-100 rounded-full">
       {@render checkbox({field: 'base', label: 'Field Manual'})}
       {@render checkbox({field: 'amaranth', label: 'Amaranth Folder'})}
       {@render checkbox({field: 'pentachoron', label: 'Project Pentachoron'})}
     </div>
   {/if}
   <button
-    class="fixed top-8 right-4 text-deep-purple"
+    class="fixed top-8 right-8 text-deep-purple"
     onclick={() => settings.open = !settings.open}
   >
     <RiSettings3Fill size='2rem'/>
   </button>
-  {@render arcSection({field:'anomaly', class:'bg-anomaly-blue'})}
+  {@render arcSection({field:'anomaly', class:'bg-anomaly-blue text-white'})}
   {@render arcSection({field:'reality', class:'bg-reality-yellow'})}
-  {@render arcSection({field:'competency', class:'bg-agency-red'})}
+  {@render arcSection({field:'competency', class:'bg-agency-red text-white'})}
   <button 
     class="fixed bottom-1/2 w-screen h-20 flex justify-center items-center bg-deep-purple border-y-2 border-white text-white text-4xl p-4 leading-none font-bold"
     onclick={generate}
