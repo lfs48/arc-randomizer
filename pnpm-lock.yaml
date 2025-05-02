@@ -11,6 +11,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.5
         version: 4.1.5(vite@6.3.4(jiti@2.4.2)(lightningcss@1.29.2))
+      svelte-remixicon:
+        specifier: ^2.7.0
+        version: 2.7.0(svelte@5.28.2)
       tailwindcss:
         specifier: ^4.1.5
         version: 4.1.5
@@ -586,6 +589,11 @@ packages:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
 
+  svelte-remixicon@2.7.0:
+    resolution: {integrity: sha512-4KPsjedRlsk+IG3ESnd7VUadvFu24SkVcK8TNm6+Zipxv0bsFSvGUYlCgP0sIuG5uwj0bv1fB8KseSlqGzAvsg==}
+    peerDependencies:
+      svelte: ^3.54.0 || ^4.0.0 || ^5.0.0
+
   svelte@5.28.2:
     resolution: {integrity: sha512-FbWBxgWOpQfhKvoGJv/TFwzqb4EhJbwCD17dB0tEpQiw1XyUEKZJtgm4nA4xq3LLsMo7hu5UY/BOFmroAxKTMg==}
     engines: {node: '>=18'}
@@ -1068,6 +1076,10 @@ snapshots:
       fsevents: 2.3.3
 
   source-map-js@1.2.1: {}
+
+  svelte-remixicon@2.7.0(svelte@5.28.2):
+    dependencies:
+      svelte: 5.28.2
 
   svelte@5.28.2:
     dependencies:

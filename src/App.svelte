@@ -1,4 +1,6 @@
 <script>
+  import { RiLockLine, RiLockUnlockLine } from 'svelte-remixicon';
+
   const anomalies = [
     'Whisper',
     'Catalogue',
@@ -39,18 +41,31 @@
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  let anomaly = null;
-  let reality = null;
-  let competency = null;
+  const arcs = $state({
+    anomaly: {
+      value: '???',
+      locked: false,
+    },
+    reality: {
+      value: '???',
+      locked: false,
+    },
+    competency: {
+      value: '???',
+      locked: false,
+    },
+  });
 
   function generate() {
-    anomaly = getRandomElement(anomalies);
-    reality = getRandomElement(realities);
-    competency = getRandomElement(competencies);
+    if (!arcs.anomaly.locked) { arcs.anomaly.value = getRandomElement(anomalies) };
+    if (!arcs.reality.locked) { arcs.reality.value = getRandomElement(realities) };
+    if (!arcs.competency.locked) { arcs.competency.value = getRandomElement(competencies) };
+  }
+
+  function toggleLock(field) {
+    arcs[field].locked = !arcs[field].locked;
   }
 </script>
-
-
 
 <style>
   @reference "./app.css";
@@ -73,34 +88,38 @@
     @apply
     text-2xl
     font-bold
+    uppercase
   ;}
 </style>
 
+{#snippet arcSection(args)}
+  <section class={`${args.class} text-deep-purple border-r-2 border-deep-purple`}>
+    <button
+      class="flex flex-col items-center space-y-2 cursor-pointer"
+      onclick={() => toggleLock(args.field)}
+    >
+      {#if arcs[args.field].locked}
+        <RiLockLine size='2rem'/>
+      {:else}
+        <RiLockUnlockLine size='2rem'/>
+      {/if}
+      <h2>{args.field}</h2>
+    </button>
+    <div><!----></div>
+    <div><!----></div>
+    <div class="flex flex-col items-center space-y-2">
+      <h1>{arcs[args.field].value}</h1>
+    </div>
+  </section>
+{/snippet}
+
 <main class='w-screen flex items-center bg-zinc-100 font-roboto'>
-  <section class="bg-anomaly-blue text-white border-r-2 border-r-deep-purple">
-    <div class="flex flex-col items-center space-y-2">
-      <h2>ANOMALY</h2>
-      <h1>{anomaly || '???'}</h1>
-    </div>
-    <div><!----></div>
-  </section>
-  <section class="bg-reality-yellow text-deep-purple border-r-2 border-deep-purple">
-    <div class="flex flex-col items-center space-y-2">
-      <h2>REALITY</h2>
-      <h1>{reality || '???'}</h1>
-    </div>
-    <div><!----></div>
-  </section>
-  <section class="bg-agency-red text-white">
-    <div class="flex flex-col items-center space-y-2">
-      <h2>COMPETENCY</h2>
-      <h1>{competency || '???'}</h1>
-    </div>
-    <div><!----></div>
-  </section>
+  {@render arcSection({field:'anomaly', class:'bg-anomaly-blue'})}
+  {@render arcSection({field:'reality', class:'bg-reality-yellow'})}
+  {@render arcSection({field:'competency', class:'bg-agency-red'})}
   <button 
-    class="fixed bottom-1/3 w-screen h-20 flex justify-center items-center bg-deep-purple border-y-2 border-white text-white text-4xl p-4 leading-none font-bold cursor-pointer"
-    on:click={generate}
+    class="fixed bottom-1/2 w-screen h-20 flex justify-center items-center bg-deep-purple border-y-2 border-white text-white text-4xl p-4 leading-none font-bold cursor-pointer"
+    onclick={generate}
   >
     RANDOMIZE
   </button>
