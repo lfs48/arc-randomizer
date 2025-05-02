@@ -116,14 +116,19 @@
   });
 
   function generate() {
-    if (!arcs.anomaly.locked) { arcs.anomaly.value = getRandomElement( selectedSources['anomaly'] ) };
-    if (!arcs.reality.locked) { arcs.reality.value = getRandomElement( selectedSources['reality'] ) };
-    if (!arcs.competency.locked) { arcs.competency.value = getRandomElement( selectedSources['competency'] ) };
+    if (!arcs.anomaly.locked) { arcs.anomaly.value = getRandomElement( selectedSources['anomaly'] ) || '???' };
+    if (!arcs.reality.locked) { arcs.reality.value = getRandomElement( selectedSources['reality'] ) || '???' };
+    if (!arcs.competency.locked) { arcs.competency.value = getRandomElement( selectedSources['competency'] ) || '???' };
   }
 
   function toggleLock(field) {
     arcs[field].locked = !arcs[field].locked;
   }
+
+  const buttonDisabled = $derived(
+    !(settings.base || settings.amaranth || settings.pentachoron) || 
+    (arcs.anomaly.locked && arcs.reality.locked && arcs.competency.locked)
+  )
 </script>
 
 <style>
@@ -152,6 +157,7 @@
   button{
     @apply
     cursor-pointer
+    disabled:cursor-default
   ;}
 </style>
 
@@ -205,8 +211,9 @@
   {@render arcSection({field:'reality', class:'bg-reality-yellow'})}
   {@render arcSection({field:'competency', class:'bg-agency-red text-white'})}
   <button 
-    class="fixed bottom-1/2 w-screen h-20 flex justify-center items-center bg-deep-purple border-y-2 border-white text-white text-4xl p-4 leading-none font-bold"
+    class="fixed bottom-1/2 w-screen h-20 flex justify-center items-center bg-deep-purple border-y-2 border-white text-white disabled:text-gray-400 text-4xl p-4 leading-none font-bold"
     onclick={generate}
+    disabled={buttonDisabled}
   >
     RANDOMIZE
   </button>
