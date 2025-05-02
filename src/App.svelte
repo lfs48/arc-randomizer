@@ -67,11 +67,15 @@
     },
   };
 
-  const settings = $state({
-    open: false,
+  const settings = $state( localStorage.getItem('settings') ? JSON.parse(localStorage.getItem('settings')) : {
+    open: true,
     base: true,
     amaranth: false,
     pentachoron: false,
+  });
+
+  $effect(() => {
+    localStorage.setItem('settings', JSON.stringify(settings));
   });
 
   let selectedSources = $derived({
