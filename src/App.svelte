@@ -74,18 +74,10 @@
     pentachoron: false,
   });
 
-  let selectedSources = $state({
-    anomaly: [],
-    reality: [],
-    competency: [],
-  })
-
-  $effect(() => {
-    selectedSources = {
-      anomaly: getSelectedSources('anomaly'),
-      reality: getSelectedSources('reality'),
-      competency: getSelectedSources('competency'),
-    };
+  let selectedSources = $derived({
+    anomaly: getSelectedSources('anomaly'),
+    reality: getSelectedSources('reality'),
+    competency: getSelectedSources('competency'),
   });
 
   function getSelectedSources(field) {
