@@ -1,41 +1,101 @@
 <script>
-  import { RiLockLine, RiLockUnlockLine } from 'svelte-remixicon';
+  import { RiLockLine, RiLockUnlockLine, RiSettings3Fill } from 'svelte-remixicon';
+    import { get } from 'svelte/store';
 
-  const anomalies = [
-    'Whisper',
-    'Catalogue',
-    'Drain',
-    'Timepiece',
-    'Growth',
-    'Gun',
-    'Dream',
-    'Manifold',
-    'Absence',
-  ];
+  const data = {
+    anomaly: {
+      base: [
+        'Whisper',
+        'Catalogue',
+        'Drain',
+        'Timepiece',
+        'Growth',
+        'Gun',
+        'Dream',
+        'Manifold',
+        'Absence',
+      ],
+      amaranth: [
+        'Storm',
+        'Crown',
+        'Ritual',
+      ],
+      pentachoron: [
+        'Ascent',
+      ],
+    },
+    reality: {
+      base: [
+        'Caretaker',
+        'Overbooked',
+        'Pursued',
+        'Star',
+        'Struggling',
+        'Newborn',
+        'Romantic',
+        'Backbone',
+        'Creature',
+      ],
+      amaranth: [
+        'Doomed',
+        'Seeker',
+        'Elder',
+      ],
+      pentachoron: [
+        'Obsessed',
+      ],
+    },
+    competency: {
+      base: [
+        'PR',
+        'R&D',
+        'Barista',
+        'CEO',
+        'Intern',
+        'Gravedigger',
+        'Reception',
+        'Hotline',
+        'Clown',
+      ],
+      amaranth: [
+        'Consultant',
+        'Logistics',
+        'Firefighter',
+      ],
+      pentachoron: [
+        'Coach',
+      ]
+    },
+  };
 
-  const realities = [
-    'Caretaker',
-    'Overbooked',
-    'Pursued',
-    'Star',
-    'Struggling',
-    'Newborn',
-    'Romantic',
-    'Backbone',
-    'Creature',
-  ];
+  const settings = $state({
+    open: false,
+    base: true,
+    amaranth: false,
+    pentachoron: false,
+  });
 
-  const competencies = [
-    'PR',
-    'R&D',
-    'Barista',
-    'CEO',
-    'Intern',
-    'Gravedigger',
-    'Reception',
-    'Hotline',
-    'Clown',
-  ];
+  let selectedSources = $state({
+    anomaly: [],
+    reality: [],
+    competency: [],
+  })
+
+  $effect(() => {
+    selectedSources = {
+      anomaly: getSelectedSources('anomaly'),
+      reality: getSelectedSources('reality'),
+      competency: getSelectedSources('competency'),
+    };
+  });
+
+  function getSelectedSources(field) {
+    const res = [];
+    if (settings.base) { res.push(...data[field].base) }
+    if (settings.amaranth) { res.push(...data[field].amaranth) }
+    if (settings.pentachoron) { res.push(...data[field].pentachoron) }
+    return res;
+  }
 
   function getRandomElement(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
@@ -57,9 +117,9 @@
   });
 
   function generate() {
-    if (!arcs.anomaly.locked) { arcs.anomaly.value = getRandomElement(anomalies) };
-    if (!arcs.reality.locked) { arcs.reality.value = getRandomElement(realities) };
-    if (!arcs.competency.locked) { arcs.competency.value = getRandomElement(competencies) };
+    if (!arcs.anomaly.locked) { arcs.anomaly.value = getRandomElement( selectedSources['anomaly'] ) };
+    if (!arcs.reality.locked) { arcs.reality.value = getRandomElement( selectedSources['reality'] ) };
+    if (!arcs.competency.locked) { arcs.competency.value = getRandomElement( selectedSources['competency'] ) };
   }
 
   function toggleLock(field) {
@@ -90,12 +150,16 @@
     font-bold
     uppercase
   ;}
+  button{
+    @apply
+    cursor-pointer
+  ;}
 </style>
 
 {#snippet arcSection(args)}
   <section class={`${args.class} text-deep-purple border-r-2 border-deep-purple`}>
     <button
-      class="flex flex-col items-center space-y-2 cursor-pointer"
+      class="flex flex-col items-center space-y-2"
       onclick={() => toggleLock(args.field)}
     >
       {#if arcs[args.field].locked}
@@ -113,12 +177,36 @@
   </section>
 {/snippet}
 
+{#snippet checkbox(args)}
+  <div class="flex items-center space-x-1">
+    <input
+      type="checkbox"
+      class="w-4 h-4 cursor-pointer"
+      bind:checked={settings[args.field]}
+    />
+    <label class="text-xs font-bold">{args.label}</label>
+  </div>
+{/snippet}
+
 <main class='w-screen flex items-center bg-zinc-100 font-roboto'>
+  {#if settings.open}
+    <div class="fixed top-7 right-3 flex space-x-4 pl-3 py-3 pr-12 bg-zinc-100 rounded-full">
+      {@render checkbox({field: 'base', label: 'Field Manual'})}
+      {@render checkbox({field: 'amaranth', label: 'Amaranth Folder'})}
+      {@render checkbox({field: 'pentachoron', label: 'Project Pentachoron'})}
+    </div>
+  {/if}
+  <button
+    class="fixed top-8 right-4 text-deep-purple"
+    onclick={() => settings.open = !settings.open}
+  >
+    <RiSettings3Fill size='2rem'/>
+  </button>
   {@render arcSection({field:'anomaly', class:'bg-anomaly-blue'})}
   {@render arcSection({field:'reality', class:'bg-reality-yellow'})}
   {@render arcSection({field:'competency', class:'bg-agency-red'})}
   <button 
-    class="fixed bottom-1/2 w-screen h-20 flex justify-center items-center bg-deep-purple border-y-2 border-white text-white text-4xl p-4 leading-none font-bold cursor-pointer"
+    class="fixed bottom-1/2 w-screen h-20 flex justify-center items-center bg-deep-purple border-y-2 border-white text-white text-4xl p-4 leading-none font-bold"
     onclick={generate}
   >
     RANDOMIZE
