@@ -57,12 +57,11 @@
   section {
     @apply
     basis-1/3
-    h-full
+    h-screen
     flex
     flex-col
-    justify-center
+    justify-evenly
     items-center
-    space-y-4
   ;}
 
   h1 {
@@ -77,23 +76,30 @@
   ;}
 </style>
 
-<main class='w-screen h-screen flex flex-col justify-evenly items-center py-16 bg-zinc-100 font-roboto'>
-  <div class="w-[80rem] h-[20rem] flex border-2 border-deep-purple rounded-[7px]">
-    <section class="bg-anomaly-blue text-white rounded-l border-r-2 border-r-deep-purple">
+<main class='w-screen flex items-center bg-zinc-100 font-roboto'>
+  <section class="bg-anomaly-blue text-white border-r-2 border-r-deep-purple">
+    <div class="flex flex-col items-center space-y-2">
       <h2>ANOMALY</h2>
       <h1>{anomaly || '???'}</h1>
-    </section>
-    <section class="bg-reality-yellow text-deep-purple border-r-2 border-r-deep-purple">
+    </div>
+    <div><!----></div>
+  </section>
+  <section class="bg-reality-yellow text-deep-purple border-r-2 border-deep-purple">
+    <div class="flex flex-col items-center space-y-2">
       <h2>REALITY</h2>
       <h1>{reality || '???'}</h1>
-    </section>
-    <section class="bg-agency-red text-white rounded-r">
+    </div>
+    <div><!----></div>
+  </section>
+  <section class="bg-agency-red text-white">
+    <div class="flex flex-col items-center space-y-2">
       <h2>COMPETENCY</h2>
       <h1>{competency || '???'}</h1>
-    </section>
-  </div>
+    </div>
+    <div><!----></div>
+  </section>
   <button 
-    class="flex items-center bg-deep-purple rounded text-white text-4xl p-4 leading-none font-bold cursor-pointer"
+    class="fixed bottom-1/3 w-screen h-20 flex justify-center items-center bg-deep-purple border-y-2 border-white text-white text-4xl p-4 leading-none font-bold cursor-pointer"
     on:click={generate}
   >
     RANDOMIZE
