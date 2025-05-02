@@ -150,12 +150,13 @@
 
   h1 {
     @apply
-    text-4xl
+    text-lg
+    lg:text-4xl
     font-bold
   ;}
   h2 {
     @apply
-    text-2xl
+    lg:text-2xl
     font-bold
     uppercase
   ;}
@@ -194,7 +195,7 @@
       class="w-4 h-4 cursor-pointer"
       bind:checked={settings[args.field]}
     />
-    <label class="text-xs font-bold">{args.label}</label>
+    <label class="text-[0.5rem] lg:text-xs font-bold">{args.label}</label>
   </div>
 {/snippet}
 
