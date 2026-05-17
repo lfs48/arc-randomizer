@@ -21,6 +21,7 @@
       ],
       pentachoron: [
         'Ascent',
+        'Judgment',
       ],
     },
     reality: {
@@ -42,6 +43,7 @@
       ],
       pentachoron: [
         'Obsessed',
+        'Daredevil'
       ],
     },
     competency: {
@@ -63,16 +65,50 @@
       ],
       pentachoron: [
         'Coach',
+        'Quant',
       ]
     },
   };
 
-  const settings = $state( localStorage.getItem('settings') ? JSON.parse(localStorage.getItem('settings')) : {
-    open: true,
-    base: true,
-    amaranth: false,
-    pentachoron: false,
-  });
+  function initializeSettings() {
+    const stored = localStorage.getItem('settings');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Migrate old settings format to new format
+      if ('base' in parsed && !('selectedItems' in parsed)) {
+        const newSettings = {
+          open: parsed.open ?? true,
+          selectedItems: {}
+        };
+        // Initialize all items based on old settings
+        for (const field in data) {
+          for (const tier in data[field]) {
+            const isSelected = parsed[tier] ?? false;
+            for (const item of data[field][tier]) {
+              newSettings.selectedItems[item] = isSelected;
+            }
+          }
+        }
+        return newSettings;
+      }
+      return parsed;
+    }
+    // Initialize new format with all base items selected
+    const defaultSettings = {
+      open: true,
+      selectedItems: {}
+    };
+    for (const field in data) {
+      for (const tier in data[field]) {
+        for (const item of data[field][tier]) {
+          defaultSettings.selectedItems[item] = tier === 'base';
+        }
+      }
+    }
+    return defaultSettings;
+  }
+
+  const settings = $state(initializeSettings());
 
   $effect(() => {
     localStorage.setItem('settings', JSON.stringify(settings));
@@ -86,9 +122,13 @@
 
   function getSelectedSources(field) {
     const res = [];
-    if (settings.base) { res.push(...data[field].base) }
-    if (settings.amaranth) { res.push(...data[field].amaranth) }
-    if (settings.pentachoron) { res.push(...data[field].pentachoron) }
+    for (const tier of ['base', 'amaranth', 'pentachoron']) {
+      for (const item of data[field][tier]) {
+        if (settings.selectedItems[item]) {
+          res.push(item);
+        }
+      }
+    }
     return res;
   }
 
@@ -130,7 +170,22 @@
     arcs[field].locked = !arcs[field].locked;
   }
 
-  const noSourceSelected = $derived(!(settings.base || settings.amaranth || settings.pentachoron) );
+  function getTierItems(tier) {
+    return ['anomaly', 'reality', 'competency'].flatMap((field) => data[field][tier]);
+  }
+
+  function isTierFullySelected(tier) {
+    return getTierItems(tier).every((item) => settings.selectedItems[item]);
+  }
+
+  function toggleTierSelection(tier) {
+    const shouldSelect = !isTierFullySelected(tier);
+    for (const item of getTierItems(tier)) {
+      settings.selectedItems[item] = shouldSelect;
+    }
+  }
+
+  const noSourceSelected = $derived(Object.values(settings.selectedItems).every(v => !v));
   const allColsLocked = $derived(arcs.anomaly.locked && arcs.reality.locked && arcs.competency.locked);
   const buttonDisabled = $derived(loading || noSourceSelected || allColsLocked);
 
@@ -188,27 +243,52 @@
   </section>
 {/snippet}
 
-{#snippet checkbox(args)}
+{#snippet itemCheckbox(args)}
   <div class="flex items-center space-x-1">
     <input
       type="checkbox"
       class="w-4 h-4 cursor-pointer"
-      bind:checked={settings[args.field]}
+      id={args.item}
+      bind:checked={settings.selectedItems[args.item]}
     />
-    <label class="text-[0.5rem] lg:text-xs font-bold">{args.label}</label>
+    <label class="text-[0.5rem] lg:text-xs font-bold cursor-pointer" for={args.item}>{args.item}</label>
   </div>
 {/snippet}
 
 <main class='w-screen flex items-center bg-zinc-100 font-roboto'>
   {#if settings.open}
-    <div class="fixed top-7 right-7 flex space-x-4 pl-3 py-3 pr-12 bg-zinc-100 rounded-full">
-      {@render checkbox({field: 'base', label: 'Field Manual'})}
-      {@render checkbox({field: 'amaranth', label: 'Amaranth Folder'})}
-      {@render checkbox({field: 'pentachoron', label: 'Project Pentachoron'})}
+    <div class="fixed z-20 top-7 right-7 max-h-[80vh] overflow-y-auto flex flex-col space-y-3 pl-3 py-3 pr-4 bg-zinc-100 rounded-lg shadow-lg">
+      {#each ['base', 'amaranth', 'pentachoron'] as tier}
+        <div class="border-b pb-2 mb-1">
+          <h3 class="text-xs lg:text-sm font-bold uppercase mb-2">
+            {tier === 'base' ? 'Field Manual' : tier === 'amaranth' ? 'Amaranth Folder' : 'Project Pentachoron'}
+          </h3>
+          <div class="flex flex-col space-y-2 ml-2">
+            {#each ['anomaly', 'reality', 'competency'] as field}
+              <div class="flex flex-col space-y-1">
+                <div class={`text-[0.5rem] lg:text-xs font-semibold uppercase ${field === 'anomaly' ? 'text-anomaly-blue' : field === 'reality' ? 'text-reality-yellow' : 'text-agency-red'}`}>{field}</div>
+                <div class="flex flex-col space-y-1 ml-2">
+                  {#each data[field][tier] as item}
+                    {@render itemCheckbox({item})}
+                  {/each}
+                </div>
+              </div>
+            {/each}
+          </div>
+          <div class="flex justify-end mt-2">
+            <button
+              class="text-[0.5rem] lg:text-xs font-bold uppercase text-deep-purple"
+              onclick={() => toggleTierSelection(tier)}
+            >
+              {isTierFullySelected(tier) ? 'Deselect all' : 'Select all'}
+            </button>
+          </div>
+        </div>
+      {/each}
     </div>
   {/if}
   <button
-    class="fixed top-8 right-8 text-deep-purple"
+    class="fixed z-30 top-8 right-12 text-deep-purple"
     onclick={() => settings.open = !settings.open}
   >
     <RiSettings3Fill size='2rem'/>
