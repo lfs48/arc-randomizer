@@ -23,6 +23,20 @@
         'Ascent',
         'Judgment',
       ],
+      pandora: [
+        'Threshold',
+        'Cornerstone',
+        'Dread',
+        'Index',
+        'Feast',
+        'Projection',
+        'Skitter',
+        'Synapse',
+        'Fathom',
+      ],
+      misc: [
+        'Fire',
+      ],
     },
     reality: {
       base: [
@@ -66,7 +80,7 @@
       pentachoron: [
         'Coach',
         'Quant',
-      ]
+      ],
     },
   };
 
@@ -120,10 +134,13 @@
     competency: getSelectedSources('competency'),
   });
 
+  const ARC_FIELDS = ['anomaly', 'reality', 'competency'];
+  const SOURCE_TIERS = ['base', 'amaranth', 'pentachoron', 'pandora', 'misc'];
+
   function getSelectedSources(field) {
     const res = [];
-    for (const tier of ['base', 'amaranth', 'pentachoron']) {
-      for (const item of data[field][tier]) {
+    for (const tier of SOURCE_TIERS) {
+      for (const item of (data[field][tier] ?? [])) {
         if (settings.selectedItems[item]) {
           res.push(item);
         }
@@ -171,7 +188,7 @@
   }
 
   function getTierItems(tier) {
-    return ['anomaly', 'reality', 'competency'].flatMap((field) => data[field][tier]);
+    return ARC_FIELDS.flatMap((field) => data[field][tier] ?? []);
   }
 
   function isTierFullySelected(tier) {
@@ -258,21 +275,23 @@
 <main class='w-screen flex items-center bg-zinc-100 font-roboto'>
   {#if settings.open}
     <div class="fixed z-20 top-7 right-7 max-h-[80vh] overflow-y-auto flex flex-col space-y-3 pl-3 py-3 pr-4 bg-zinc-100 rounded-lg shadow-lg">
-      {#each ['base', 'amaranth', 'pentachoron'] as tier}
+      {#each SOURCE_TIERS as tier}
         <div class="border-b pb-2 mb-1">
           <h3 class="text-xs lg:text-sm font-bold uppercase mb-2">
-            {tier === 'base' ? 'Field Manual' : tier === 'amaranth' ? 'Amaranth Folder' : 'Project Pentachoron'}
+            {tier === 'base' ? 'Field Manual' : tier === 'amaranth' ? 'Amaranth Folder' : tier === 'pentachoron' ? 'Project Pentachoron' : tier === 'pandora' ? 'Pandora Papers' : 'Miscellaneous'}
           </h3>
           <div class="flex flex-col space-y-2 ml-2">
-            {#each ['anomaly', 'reality', 'competency'] as field}
-              <div class="flex flex-col space-y-1">
-                <div class={`text-[0.5rem] lg:text-xs font-semibold uppercase ${field === 'anomaly' ? 'text-anomaly-blue' : field === 'reality' ? 'text-reality-yellow' : 'text-agency-red'}`}>{field}</div>
-                <div class="flex flex-col space-y-1 ml-2">
-                  {#each data[field][tier] as item}
-                    {@render itemCheckbox({item})}
-                  {/each}
+            {#each ARC_FIELDS as field}
+              {#if (data[field][tier]?.length ?? 0) > 0}
+                <div class="flex flex-col space-y-1">
+                  <div class={`text-[0.5rem] lg:text-xs font-semibold uppercase ${field === 'anomaly' ? 'text-anomaly-blue' : field === 'reality' ? 'text-reality-yellow' : 'text-agency-red'}`}>{field}</div>
+                  <div class="flex flex-col space-y-1 ml-2">
+                    {#each data[field][tier] as item}
+                      {@render itemCheckbox({item})}
+                    {/each}
+                  </div>
                 </div>
-              </div>
+              {/if}
             {/each}
           </div>
           <div class="flex justify-end mt-2">
